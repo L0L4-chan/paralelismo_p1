@@ -27,51 +27,60 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    //int i, n, count=0;
-    
-    int n, count = 0;
+    MPI_Init(&argc, &argv);//inicializamos que los procesos se comuniquen
+     
+    int n, size,rank, count = 0;
     char *cadena;
     char L;
-
-    n = atoi(argv[1]);//numero de procesos
-    L = *argv[2];//Letra a contar
-
+    
+    size = MPI_Comm_size(MPI_COMM_WORLD, &argv[3]);// numero de procesos
+    rank = MPI_Comm_rank(MPI_COMM_WORLD, &);//devuelve el rango de cada proceso
+    
     cadena = (char *) malloc(n*sizeof(char));
-    //inicializaCadena(cadena, n);
     
-    //Pendiente creacion de los argumentos 
+    if(rank==0){
+    	n = atoi(argv[1]);//tamaño de la cadena 
+        L = *argv[2];//Letra a contar
+    	
+    	for(int j = 1 ; j< size; i++{//bucle para envio de argumentos
+    		 
+    		 MPI_send(&n,1,MPI_INT, i,MPI_ANY_TAG, MPI_COMM_WORLD );//enviamos el tamaño de la cadena
+    		 MPI_send(&L,1, MPI_CHAR,i,MIP_ANY_TAG, MPI_COMM_WORLD );//enviamos el char
+    		}
+    else{
+    	MPI_Recv(&n,1,MPI_INT, 0,MPI_ANY_TAG, MPI_COMM_WORLD,status.MPI_TAG);//cada proceso recibe n y L
+    	MPI_Recv(&L,1,MPI_INT, 0,MPI_ANY_TAG, MPI_COMM_WORLD,status.MPI_TAG));
     
-    MPI_Init(&argc, & argv);//inicializamos los procesos
-    MPI_Comm_size(MPI_COMM_WORLD, &argv[3]);// 
-    MPI_Comm_rank(MPI_COMM_WORLD, &t_id);///asignamos un identificador
+    }
+
+
     
-/*
-    for(i=0; i<n; i++){
+    inicializaCadena(cadena, n);  //inicializamos la cadena
+    
+    //operacion de conteo
+    for(i=rank; i<n; i+size){
         if(cadena[i] == L){
             count++;
         }
     }
 
+    if(rank==0){
+   
+    	for(int j = 1 ; j< size; i++{//recepcion del contador
+   		int aux;
+   		 mpi_recieve(&aux,1,MPI_INT, i,MPI_ANY_TAG, MPI_COMM_WORLD,status.MPI_TAG);//recibimos de cada particion
+   		 }
+   		//suma
+   		 
+   		 count = count + aux;
+   	
+    printf("El numero de apariciones de la letra %c es %d\n", L, count);	 
+    else{
+    	 MPI_send(&count,1,MPI_INT, 0,MPI_ANY_TAG, MPI_COMM_WORLD );//cada proceso (menos el 0) envia su contador
+    	
+    }
     
-    printf("El numero de apariciones de la letra %c es %d\n", L, count);
-    
-*/
-    int rank  = Get_rank();
- 
-    if(rank == 0){
-    inicializaCadena(cadena, n);// el proceso 0 debe iniciar el array
-    //enviar a los otros procesos los indices a comprobar 
-        // realizar la tarea
-    //Recibir de los otros procesos los resultados o el aviso de finalizacion de estado 
-    printf("El numero de apariciones de la letra %c es %d\n", L, count);// e imprimir la salida
-	}else{
-        //si no es el proceso 0 debera realizar su tarea
-        //recibir sus indices
-        //realizar tarea
-        //mandar respuesta
-	
-	}
-	
+
     MPI_Finalize();	// se cierra la tarea dividida
     free(cadena);
     exit(0);
