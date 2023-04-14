@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
             count++;
         }
     }
-    
+    //se realiza la suma de los datos
     MPI_FlattreeColectiva(&count,&count, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
     
     if(rank==0){    
@@ -78,18 +78,18 @@ int main(int argc, char *argv[])
 }
 
 
-int MPI_BinomialColectiva(void * buff, int count, MPI_Datatype datatype, int root, MPI_Comm comm) {
+int MPI_BinomialColectiva(void * buff, int count, MPI_Datatype datatype, int root, MPI_Comm comm) {//mismos parametros
 
-    if (rank != 0) {
+    if (rank != 0) { //todos los procesos menos el 0 recibiran sólo una vez
                 MPI_Recv(buff, count, datatype, MPI_ANY_SOURCE, MPI_ANY_TAG, comm, MPI_STATUS_IGNORE);//recibe
     }
-
+   //todos los procesos 
     for (int j = 0; j < size; j++) {//bucle para envio de argumentos
 
         int n = pow(2, j);
-        if (rank + n < size && rank < n) { 
+        if (rank + n < size && rank < n) { //si cumplen las condiciones 
 
-            MPI_Send(buff, count, datatype, (rank + n), 0, comm);     //enviamos el dato en cuestion
+            MPI_Send(buff, count, datatype, (rank + n), 0, comm);     //envian el dato en cuestion
         }
     }
 return 0;
@@ -100,17 +100,17 @@ return 0;
 
 int MPI_FlattreeColectiva (void * buff, void * recvbuff, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm){ //mantenemos cabecera
     int aux = 0;
-
-    if (op != MPI_SUM)
+// gestion de excepciones posibles 
+    if (op != MPI_SUM)//operacion que no sea suma
         return MPI_ERR_OP;
-    else if (datatype != MPI_INT)
+    else if (datatype != MPI_INT)//tipo de dato que no sea entero
         return MPI_ERR_TYPE;
-    else if (count != 1)
+    else if (count != 1)//que se este enviando más de un dato
         return MPI_ERR_COUNT;
 
     //printf("count %d, rank, %d\n", count, rank);
     
-	if(rank==root) {
+	if(rank==root) { //se recepciona y suman los contadores
 	aux = *(int*)recvbuff;
        // printf("El total es count %d y el rank es %d \n", aux, rank);
         for (int j = 1; j < size; j++) {
@@ -123,7 +123,7 @@ int MPI_FlattreeColectiva (void * buff, void * recvbuff, int count, MPI_Datatype
         *(int*) recvbuff = aux;
 
     }
-    else{
+    else{//cada proceso envia su contador
         MPI_Send(buff,1,datatype, 0,0, comm );
 
         //printf("count %d, rank, %d\n", c, rank);
