@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
 
 
     if(rank==0){
+	    // leemos los datos, solo proceso 0
         n = atoi(argv[1]);//tamaño de la cadena
         L = *argv[2];//Letra a contar
 
@@ -67,19 +68,19 @@ int main(int argc, char *argv[])
         }
     }
 
-    if(rank==0){
+    if(rank==0){ //el proceso 0 es el encargado de sumar e imprimir
         int aux;
         for(int j = 1 ; j<size; j++){//recepcion del contador
 
             MPI_Recv(&aux,1,MPI_INT, j,MPI_ANY_TAG, MPI_COMM_WORLD,MPI_STATUS_IGNORE);//recibimos de cada particion
-            count = count + aux;	
+            count = count + aux; //suma de los contadores	
         }
-        //suma	
+       	
         
         printf("El numero de apariciones de la letra %c es %d\n", L, count);
 
     }
-    else{
+    else{//el resto de procesos envia sus resultados
         MPI_Send(&count,1,MPI_INT, 0,0, MPI_COMM_WORLD );//cada proceso (menos el 0) envia su contador
     }
 
