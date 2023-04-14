@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
         }
     }
     
-    int aux;
-    MPI_Reduce(&count,&aux, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+    int aux;//variable ausiliar para la recepcion de los valores
+    MPI_Reduce(&count,&aux, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);// esta operacion realizara la suma de los contadores(le indicamos con un parametro que es la suma)
     
     if(rank==0){    
     printf("El numero de apariciones de la letra %c es %d\n", L, aux);
