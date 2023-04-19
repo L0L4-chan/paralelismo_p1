@@ -41,20 +41,11 @@ int main(int argc, char *argv[]){
     if(rank==0){
         n = atoi(argv[1]);//tamaÃ±o de la cadena
         L = *argv[2];//Letra a contar
-
-        //Bucle para realizar el send y el recieved de las variables n y L
-        for(int j = 1 ; j<size; j++){//bucle para envio de argumentos
-            MPI_Send(&n,1,MPI_INT, j, 0, MPI_COMM_WORLD );//enviamos el tamaÃ±o de la cadena
-            MPI_Send(&L,1, MPI_CHAR, j, 0, MPI_COMM_WORLD );//enviamos el char
-
-        }
     }
-        //recepciÃ³n de los argumentos n y L
-    else{
-        MPI_Recv(&n,1,MPI_INT, 0,MPI_ANY_TAG, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-        MPI_Recv(&L,1,MPI_CHAR, 0,MPI_ANY_TAG, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 
-    }
+    //esta funcion realiza el send y el recieved de las variables n y L
+    MPI_Bcast(&n,1, MPI_INT, 0, MPI_COMM_WORLD );//enviamos el tamaÃ±o de la cadena
+    MPI_Bcast(&L,1, MPI_CHAR, 0, MPI_COMM_WORLD );//enviamos el char
 
     // se realiza la inicializacion de la cadena
     cadena = (char *) malloc(n*sizeof(char));
@@ -67,28 +58,17 @@ int main(int argc, char *argv[]){
         }
     }
 
-    //bucle para el send y el recieved del contador de cada proceso. Se envÃ­a la info desde el resto de procesos a P0
+    //esta funcion realiza el send y el recieved del contador de cada proceso. Se envÃ­a la info desde el resto de procesos a P0
+    int aux;
+    MPI_Reduce(&count,&aux, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    //Print del resultado por P0
     if(rank==0){
-        int aux;
-        for(int j = 1 ; j<size; j++){
-            //recepcion del contador
-            MPI_Recv(&aux,1,MPI_INT, j,MPI_ANY_TAG, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-            //Contador acumulado
-            count = count + aux;
-        }
-
-        //Print del resultado por P0
-        printf("El numero de apariciones de la letra %c es %d\n", L, count);
-
+        printf("El numero de apariciones de la letra %c es %d\n", L, aux);
     }
-    else{
-        //EnvÃ­o de contador, cada proceso (menos el 0) envia su contador
-        MPI_Send(&count,1,MPI_INT, 0,0, MPI_COMM_WORLD );
-    }
+
 
     MPI_Finalize();	// se cierra la tarea dividida
     free(cadena);
     exit(0);
 }
-
-
