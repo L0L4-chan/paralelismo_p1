@@ -94,8 +94,6 @@ int main(int argc, char *argv[] ) {
    //medición del tiempo de comunicación 1 y 2
     gettimeofday(&tv2, NULL); 
     int microseconds1 = (tv2.tv_usec - tv1.tv_usec)+ 1000000 * (tv2.tv_sec - tv1.tv_sec);//calculo de tiempo
-   //Impresión tiempo de comunicacion
-    //printf("Time procces %d = %lf\n", rank, (double) microseconds1/1E6);
     //medición comienzo del calculo
     //Conteo de distancia
     gettimeofday(&tv3, NULL);//medimos tiempo al inicio
@@ -115,17 +113,20 @@ int main(int argc, char *argv[] ) {
         //medición del tiempo final del calculo
         gettimeofday(&tv4, NULL);
         int microseconds2 = (tv4.tv_usec - tv3.tv_usec)+ 1000000 * (tv4.tv_sec - tv3.tv_sec);
-        //Impresión tiempo de computación
-        printf("Time computation %d = %lf\n", rank, (double) microseconds2/1E6);   
-
-//medición del tiempo de comunicación
+        
+    //medición del tiempo de comunicación
     gettimeofday(&tv5, NULL);
     //Funcion que une los vectores resultado en uno solo https://www.open-mpi.org/doc/v1.4/man3/MPI_Gather.3.php
     MPI_Gather(result, bloque, MPI_INT, totalresult, bloque, MPI_INT, 0, MPI_COMM_WORLD);
     //medición del tiempo de comunicación
     gettimeofday(&tv6, NULL);
     int microseconds3 = (tv6.tv_usec - tv5.tv_usec)+ 1000000 * (tv6.tv_sec - tv5.tv_sec);
-    //Impresión tiempo de comunicacion
+    
+    
+    //Impresión tiempo de comunicacion 
+    //Impresión tiempo de computación
+           
+    printf("Time computation %d = %lf\n", rank, (double) microseconds2/1E6);
     printf("Time comunication %d = %lf\n", rank, (double) (microseconds3+microseconds1)/1E6);
 
     if(rank == 0) {
@@ -144,10 +145,6 @@ int main(int argc, char *argv[] ) {
          int microseconds = (tv6.tv_usec - tv1.tv_usec)+ 1000000 * (tv6.tv_sec - tv1.tv_sec);
             printf("Time (seconds) = %lf\n", (double) microseconds / 1E6);
         }
-    
-    	for (k = 0; k < M; k++){
-    	   printf("Position %d, result %d\n", k, totalresult[k]);// imprimimos por pantalla
-    	}
 	free(data1); free(data2); free(totalresult); //liberamos el espacio de los elementos que sólo pertenence al proceso raiz, en este caso el 0
     }  
     MPI_Finalize();	// se cierra la tarea dividida   
