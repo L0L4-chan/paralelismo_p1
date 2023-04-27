@@ -143,7 +143,7 @@ int main(int argc, char *argv[] ) {
     gettimeofday(&tv5, NULL);
     //Funcion que une los vectores resultado en uno solo https://www.open-mpi.org/doc/v1.4/man3/MPI_Gatherv.3.php
     //revisar lo del vector resultado
-    MPI_Gatherv(result, 1, MPI_INT, totalresult, sendcounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Gatherv(result, 1, MPI_INT, totalresult, sendcounts/N, displs/N, MPI_INT, 0, MPI_COMM_WORLD);
 
     //medición del tiempo de comunicación
     gettimeofday(&tv6, NULL);
