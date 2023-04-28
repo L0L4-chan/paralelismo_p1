@@ -68,21 +68,28 @@ int main(int argc, char *argv[] ) {
 
     int sendcounts[size];    // array  cuantos elementos van en cada proceso
     int displs[size];        // array donde comienza el segmento de cada particion
- 
+    int gathercount[size];  //array  cuantos elementos del gather
+    int disgv[size];	//array donde comienza
+	
     int rem = (M)%size; // filas sobrantes de una division equitativa 
     int amount = (M/size)*N; //elementos por bloque
-    int sum = 0;                // para calcular el inicio de cada segmento
+    int sum = 0, sumg= 0;;                // para calcular el inicio de cada segmento
+	
  //rellenamos los arrays que contienen el numero de elementos y la posicion de inicio de cada bloque
     for (int i = 0; i < size; i++) {
         sendcounts[i] = amount;
+	gathercount[i] = M/size;    
         if (rem > 0) {
             sendcounts[i] = sendcounts[i] + N;
+	    gathercount[i] = gathercount[i] + 1;	
             rem --;
          if(rem == 1){amount = amount +N;} 
         }
 
         displs[i] = sum;
+	disgv[i] = sumg;
         sum += sendcounts[i];
+	sumg = gathercount[i]    
     }
 
     result = (int *) malloc((sendcounts[rank]/N)*sizeof(int));// lo mismo para result va a ser del tamaño numero de filas y vamos a tener que crear en el cero uno nuevo para la recogida de datos,
@@ -143,7 +150,7 @@ int main(int argc, char *argv[] ) {
     gettimeofday(&tv5, NULL);
     //Funcion que une los vectores resultado en uno solo https://www.open-mpi.org/doc/v1.4/man3/MPI_Gatherv.3.php
     //revisar lo del vector resultado
-    MPI_Gatherv(result, 1, MPI_INT, totalresult, sendcounts/N, displs/N, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Gatherv(result, 1, MPI_INT, totalresult, gathercount,disgv , MPI_INT, 0, MPI_COMM_WORLD);
 
     //medición del tiempo de comunicación
     gettimeofday(&tv6, NULL);
