@@ -114,7 +114,6 @@ int main(int argc, char *argv[] ) {
         }
     }
 
-
     //mediciÃ³n del tiempo final del computaciÃ³n e inicio de la comuniciaciÃ³n
     gettimeofday(&tv3, NULL);
 
