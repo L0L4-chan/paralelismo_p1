@@ -67,13 +67,21 @@ int main(int argc, char *argv[] ) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);// tomamos el valor del numero de procesos
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);// tomamos el valor del rango de cada proceso
 
+    if (M%size >0){
+        bloque = (M/size)+1; //calculamos el tamaÃ±o del bloque en filas que se pasa a cada proceso
+    }
+    else{
+        bloque = M/size; //calculamos el tamaÃ±o del bloque en filas que se pasa a cada proceso
+    }
+   
     /* Initialize Matrices */
     //Solo el proceso cero inicializa las matrices y el vector resultado
     if(rank == 0) {
         //reserva de memoria para las matrices y vector resultado solo con el proceso 0
-        data1 = (int *) malloc(M*N*sizeof(int));
-        data2 = (int *) malloc(M*N*sizeof(int));
-        totalresult = (int *) malloc(M*sizeof(int));
+        data1 = (int *) malloc(bloque*size*N*sizeof(int));
+        data2 = (int *) malloc(bloque*size*N*sizeof(int));
+        totalresult = (int *) malloc(bloque*size*sizeof(int));
+       
         //InicializciÃ³n matrices
         for (i = 0; i < M; i++) {
             for (j = 0; j < N; j++) {
@@ -84,12 +92,7 @@ int main(int argc, char *argv[] ) {
         }
     }
 
-    if (M%size >0){
-        bloque = (M/size)+1; //calculamos el tamaÃ±o del bloque en filas que se pasa a cada proceso
-    }
-    else{
-        bloque = M/size; //calculamos el tamaÃ±o del bloque en filas que se pasa a cada proceso
-    }
+   
 
 
     //cada proceso realizan la reserva de espacio de la matriz bloque y el vector de resultados
